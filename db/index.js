@@ -1,5 +1,6 @@
 import Mongoose from 'mongoose'
 
+import './accounts'
 import './users'
 
 export default function () {
