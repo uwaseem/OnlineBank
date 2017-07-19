@@ -13,6 +13,7 @@ export default async function () {
 
   routesAccount(app)
   routesUsers(app)
+
   app.get('/ping', (req, res) => res.status(200).json({ message: 'pong' }))
   app.all('*', (req, res) => res.sendStatus(404))
 
