@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/uwaseem/OnlineBank#readme",
   "dependencies": {
+    "axios": "^0.16.2",
     "babel-eslint": "^7.2.3",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
@@ -30,6 +31,7 @@
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "mocha": "^3.4.2",
+    "mongodb": "^2.2.30",
     "pre-commit": "^1.2.2",
     "sinon": "^2.3.8",
     "snazzy": "^7.0.0",
