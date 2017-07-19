@@ -43,12 +43,10 @@
   },
   "babel": {
     "presets": [
-      "es2015",
-      "stage-0"
+      "es2015"
     ],
     "plugins": [
       "transform-runtime",
-      "transform-async-to-generator",
       "add-module-exports"
     ]
   },
