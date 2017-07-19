@@ -31,7 +31,7 @@
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "mocha": "^3.4.2",
-    "mongodb": "^2.2.30",
+    "mongoose": "^4.11.3",
     "pre-commit": "^1.2.2",
     "sinon": "^2.3.8",
     "snazzy": "^7.0.0",
