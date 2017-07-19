@@ -5,7 +5,7 @@ import Request from 'supertest'
 
 import Server from '../../src/server'
 
-describe('#Endpoints', () => {
+describe('#Server', () => {
   let app
 
   beforeEach(async () => {
@@ -19,7 +19,7 @@ describe('#Endpoints', () => {
   })
 
   describe('GET /ping', () => {
-    it('should return 200', (done) => {
+    it('should return 200 and message === \'pong\'', (done) => {
       Request(app)
         .get('/ping')
         .expect(200)
