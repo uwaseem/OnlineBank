@@ -1,0 +1,5 @@
+--require babel-register
+--recursive
+--reporter spec
+--bail
+--check-leaks
