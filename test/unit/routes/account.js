@@ -5,7 +5,7 @@ import Request from 'supertest'
 
 import Server from '../../../src/server'
 
-describe('#Account', () => {
+xdescribe('#Account', () => {
   let app
 
   beforeEach(async () => {
