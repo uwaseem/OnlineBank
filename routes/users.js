@@ -71,9 +71,9 @@ export default function (app) {
     const { username } = req.params
 
     try {
-      const { n: success } = await Users.remove({ username })
+      const { result } = await Users.remove({ username })
 
-      if (!success) {
+      if (!result.n) {
         return res.status(400).json({ message: `Failed to delete user ${username}` })
       }
 

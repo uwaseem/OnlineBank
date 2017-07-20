@@ -33,12 +33,13 @@ export default function (app) {
   app.get('/accounts/status/:status', async (req, res) => {
     const { status } = req.params
 
+    // TODO: Use the enum instead later
+    if (status !== 'open' && status !== 'close') {
+      return res.status(404).json({ message: `${status} is an invalid account status` })
+    }
+
     try {
       const account = await Accounts.find({ status })
-
-      if (!account) {
-        return res.status(404).json({ message: `No account exist with status ${status}` })
-      }
 
       res.status(200).json(account)
     } catch (error) {
@@ -65,7 +66,9 @@ export default function (app) {
     }
   })
 
-  app.put('/account/name/:name', async (req, res) => {
+  // Let's not allow user to update account
+  // We should rethink this approach
+  /* app.put('/account/name/:name', async (req, res) => {
     const { name } = req.params
     const accountInfo = req.body
     accountInfo.name = name
@@ -74,7 +77,7 @@ export default function (app) {
       const account = await Accounts.findOneAndUpdate({ name }, accountInfo, { new: true })
 
       if (!account) {
-        return res.status(400).json({ message: `Failed to update account ${name}` })
+        return res.status(400).json({ message: `Account ${name} does not exist to be updated` })
       }
 
       res.status(200).json(account)
@@ -82,10 +85,15 @@ export default function (app) {
       console.error('Error while updating account', error)
       res.status(500).json({ message: error.message })
     }
-  })
+  }) */
 
   app.patch('/account/name/:name/:status', async (req, res) => {
     const { name, status } = req.params
+
+    // TODO: Use the enum instead later
+    if (status !== 'open' && status !== 'close') {
+      return res.status(404).json({ message: `${status} is an invalid account status` })
+    }
 
     try {
       const account = await Accounts.findOneAndUpdate({ name }, { status }, { new: true })
@@ -105,9 +113,9 @@ export default function (app) {
     const { name } = req.params
 
     try {
-      const { n: success } = await Accounts.remove({ name })
+      const { result } = await Accounts.remove({ name })
 
-      if (!success) {
+      if (!result.n) {
         return res.status(400).json({ message: `Failed to delete account ${name}` })
       }
 
