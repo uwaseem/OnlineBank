@@ -9,7 +9,7 @@ export default function (app) {
       res.status(200).json(users)
     } catch (error) {
       console.error('Error while retrieving all users', error)
-      res.sendStatus(500)
+      res.status(500).json({ message: error.message })
     }
   })
 
@@ -18,10 +18,15 @@ export default function (app) {
 
     try {
       const user = await Users.findOne({ username })
+
+      if (!user) {
+        return res.status(404).json({ message: `User ${username} does not exist` })
+      }
+
       res.status(200).json(user)
     } catch (error) {
       console.error(`Error while retrieving user ${username}`, error)
-      res.sendStatus(500)
+      res.status(500).json({ message: error.message })
     }
   })
 
@@ -32,14 +37,14 @@ export default function (app) {
       let user = await Users.findOne({ username: userInfo.username })
 
       if (user) {
-        return res.status(400).json({ message: 'username already exist' })
+        return res.status(400).json({ message: `Username ${userInfo.username} already exist` })
       }
 
       user = await Users.create(userInfo)
       res.status(200).json(user)
     } catch (error) {
       console.error('Error while creating user', error)
-      res.sendStatus(500)
+      res.status(500).json({ message: error.message })
     }
   })
 
@@ -50,6 +55,10 @@ export default function (app) {
 
     try {
       const user = await Users.findOneAndUpdate({ username }, userInfo, { new: true })
+      if (!user) {
+        return res.status(400).json({ message: `Failed to update user ${username}` })
+      }
+
       res.status(200).json(user)
     } catch (error) {
       console.error('Error while updating user', error)
@@ -61,11 +70,16 @@ export default function (app) {
     const { username } = req.params
 
     try {
-      const { result } = await Users.remove({ username })
-      res.status(200).json(result)
+      const { n: success } = await Users.remove({ username })
+
+      if (!success) {
+        return res.status(400).json({ message: `Failed to delete user ${username}` })
+      }
+
+      res.sendStatus(200)
     } catch (error) {
       console.error(`Error while deleting user ${username}`, error)
-      res.sendStatus(500)
+      res.status(500).json({ message: error.message })
     }
   })
 }
