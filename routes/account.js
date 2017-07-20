@@ -13,14 +13,26 @@ export default function (app) {
     }
   })
 
-  app.get('/accounts/owner/:username', async (req, res) => {
-    const { username } = req.params
+  app.get('/accounts/owner/:owner', async (req, res) => {
+    const { owner } = req.params
 
     try {
-      const account = await Accounts.find({ owner: username })
+      const account = await Accounts.find({ owner })
       res.status(200).json(account)
     } catch (error) {
-      console.error(`Error while retrieving account for user ${username}`, error)
+      console.error(`Error while retrieving account for user ${owner}`, error)
+      res.sendStatus(500)
+    }
+  })
+
+  app.get('/accounts/status/:status', async (req, res) => {
+    const { status } = req.params
+
+    try {
+      const account = await Accounts.find({ status })
+      res.status(200).json(account)
+    } catch (error) {
+      console.error(`Error while retrieving all account with ${status} status`, error)
       res.sendStatus(500)
     }
   })
@@ -53,6 +65,19 @@ export default function (app) {
       res.status(200).json(account)
     } catch (error) {
       console.error('Error while updating account', error)
+      res.sendStatus(500)
+    }
+  })
+
+  app.patch('/account/name/:name/:status', async(req, res) => {
+    const { name, status } = req.params
+    const action = (status === 'close') ? 'closing' : 'opening'
+
+    try {
+      const account = await Accounts.findOneAndUpdate({ name }, { status }, { new: true })
+      res.status(200).json(account)
+    } catch (error) {
+      console.error(`Error while ${action} account`, error)
       res.sendStatus(500)
     }
   })
