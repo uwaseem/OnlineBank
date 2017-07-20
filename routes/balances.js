@@ -8,7 +8,8 @@ export default function (app) {
   }
   const BalanceActions = {
     Deposit: 'deposit',
-    Withdraw: 'withdraw'
+    Withdraw: 'withdraw',
+    Transfer: 'transfer'
   }
 
   app.get('/balance/account/name/:name', async (req, res) => {
@@ -62,13 +63,13 @@ export default function (app) {
       return res.status(400).json({ message: `${action} is an invalid action` })
     }
 
+    amount = parseInt(amount)
+
+    if (!amount || amount < 0) {
+      return res.status(400).json({ message: `${amount} is not a valid amount to ${action}` })
+    }
+
     try {
-      amount = parseInt(amount)
-
-      if (amount < 0) {
-        return res.status(400).json({ message: `${amount} is not a valid amount to ${action}` })
-      }
-
       const account = await Accounts.findOne({ name })
 
       if (!account) {
@@ -96,7 +97,66 @@ export default function (app) {
       return res.status(200).json(updatedAccount)
     } catch (error) {
       console.error(`Error while performing ${action} action for account ${name}`, error)
-      res.sendStatus(500)
+      res.status(500).json({ message: error.message })
+    }
+  })
+
+  app.post('/balance/account/name/:name/:action', async (req, res) => {
+    const { action, name } = req.params
+    const { name: receivingAccount } = req.body
+    let { amount } = req.body
+
+    if (action === BalanceActions.Withdraw || action === BalanceActions.Deposit) {
+      return res.status(400).json({ message: `Try a /PUT method instead` })
+    }
+
+    if (action !== BalanceActions.Transfer) {
+      return res.status(400).json({ message: `${action} is an invalid action` })
+    }
+
+    if (!amount || !receivingAccount) {
+      return res.status(400).json({ message: `Incomplete information. Need both amount and account name` })
+    }
+
+    amount = parseInt(amount)
+
+    if (!amount || amount < 0) {
+      return res.status(400).json({ message: `${amount} is not a valid amount to ${action}` })
+    }
+
+    try {
+      const accountA = await Accounts.findOne({ name })
+      const accountB = await Accounts.findOne({ name: receivingAccount })
+
+      if (!accountA || !accountB) {
+        const missingAccount = (!accountA) ? name : receivingAccount
+        return res.status(400).json({ message: `Account ${missingAccount} does not exist` })
+      }
+
+      if (accountA.status === AccountActions.Close || accountB.status === AccountActions.Close) {
+        return res.status(400).json({ message: 'Cannot transfer to or from closed accounts' })
+      }
+
+      if (accountA.user !== accountB.user) {
+        return res.status(400).json({ message: 'Cannot transfer to account of different user' })
+      }
+
+      const newBalanceA = accountA.balance - amount
+      const newBalanceB = accountB.balance + amount
+
+      if (newBalanceA < 0) {
+        return res.status(400).json({ message: `Cannot transfer more than existing balance of ${accountA.balance}` })
+      }
+
+      const accounts = await Promise.all([
+        Accounts.findOneAndUpdate({ name }, { balance: newBalanceA }, { new: true }),
+        Accounts.findOneAndUpdate({ name: receivingAccount }, { balance: newBalanceB }, { new: true })
+      ])
+
+      res.status(200).json(accounts)
+    } catch (error) {
+      console.error(`Error while transfering money for account ${name}`, error)
+      res.status(500).json({ message: error.message })
     }
   })
 }
