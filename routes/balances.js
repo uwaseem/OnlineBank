@@ -24,38 +24,51 @@ export default function (app) {
       res.status(200).json({ balance: account.balance })
     } catch (error) {
       console.error(`Error while retrieving balance for account ${name}`, error)
-      res.sendStatus(500)
+      res.status(500).json({ message: error.message })
     }
   })
 
-  app.get('/balance/account/owner/:owner', async (req, res) => {
-    const { owner } = req.params
+  app.get('/balance/accounts/user/:user', async (req, res) => {
+    const { user } = req.params
 
     try {
-      const accounts = await Accounts.find({ owner })
+      const accounts = await Accounts.find({ user })
+
+      if (accounts && accounts.length < 1) {
+        return res.status(404).json({ message: `User ${user} does not have any account` })
+      }
+
       const result = accounts.map((account) => {
-        const { balance, name, owner } = account
-        return { balance, name, owner }
+        const { balance, name, user, status } = account
+        return { balance, name, user, status }
       })
 
       res.status(200).json(result)
     } catch (error) {
-      console.error(`Error while retrieving balance for owner ${owner}`, error)
-      res.sendStatus(500)
+      console.error(`Error while retrieving balance for user ${user}`, error)
+      res.status(500).json({ message: error.message })
     }
   })
 
   app.put('/balance/account/name/:name/:action', async (req, res) => {
     const { action, name } = req.params
-    const { amount } = req.body
+    let { amount } = req.body
+
+    if (!amount) {
+      return res.status(400).json({ message: `No amount specified` })
+    }
 
     if (action !== BalanceActions.Deposit && action !== BalanceActions.Withdraw) {
-      const message = `${action} is an invalid action`
-      console.info(message)
-      return res.status(400).json({ message })
+      return res.status(400).json({ message: `${action} is an invalid action` })
     }
 
     try {
+      amount = parseInt(amount)
+
+      if (amount < 0) {
+        return res.status(400).json({ message: `${amount} is not a valid amount to ${action}` })
+      }
+
       const account = await Accounts.findOne({ name })
 
       if (!account) {
