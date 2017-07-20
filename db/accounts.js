@@ -5,6 +5,6 @@ const accountSchema = Mongoose.Schema({
   owner: String,
   balance: Number,
   status: String
-})
+}, { strict: true })
 
 module.exports = Mongoose.model('Accounts', accountSchema)
