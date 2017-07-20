@@ -2,7 +2,8 @@ import BodyParser from 'body-parser'
 import Express from 'express'
 
 import mongoDB from '../db/index'
-import routesAccount from '../routes/account'
+import routesAccount from '../routes/accounts'
+import routesBalances from '../routes/balances'
 import routesUsers from '../routes/users'
 
 export default async function () {
@@ -12,6 +13,7 @@ export default async function () {
   app.use(BodyParser.json())
 
   routesAccount(app)
+  routesBalances(app)
   routesUsers(app)
 
   app.get('/ping', (req, res) => res.status(200).json({ message: 'pong' }))
