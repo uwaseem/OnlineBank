@@ -4,7 +4,7 @@ const accountSchema = Mongoose.Schema({
   name: String,
   owner: String,
   balance: Number,
-  active: Boolean
+  status: String
 })
 
 module.exports = Mongoose.model('Accounts', accountSchema)
