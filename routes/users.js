@@ -30,7 +30,7 @@ export default function (app) {
     }
   })
 
-  app.post('/user', async(req, res) => {
+  app.post('/user', async (req, res) => {
     const userInfo = req.body
 
     try {
@@ -48,13 +48,14 @@ export default function (app) {
     }
   })
 
-  app.put('/user/username/:username', async(req, res) => {
+  app.put('/user/username/:username', async (req, res) => {
     const { username } = req.params
     const userInfo = req.body
     userInfo.username = username
 
     try {
       const user = await Users.findOneAndUpdate({ username }, userInfo, { new: true })
+
       if (!user) {
         return res.status(400).json({ message: `Failed to update user ${username}` })
       }
@@ -62,7 +63,7 @@ export default function (app) {
       res.status(200).json(user)
     } catch (error) {
       console.error('Error while updating user', error)
-      res.sendStatus(500)
+      res.status(500).json({ message: error.message })
     }
   })
 
