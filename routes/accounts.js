@@ -20,7 +20,7 @@ export default function (app) {
       const account = await Accounts.find({ user })
 
       if (!account) {
-        return res.status(404).json({ message: `User ${user} does not have any accounts` })
+        return res.status(404).json({ message: `User ${user} does not have any account` })
       }
 
       res.status(200).json(account)
