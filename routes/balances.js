@@ -1,7 +1,11 @@
 import Mongoose from 'mongoose'
 
+import Transfer from '../api/transfer'
+
 export default function (app) {
   const Accounts = Mongoose.model('Accounts')
+  const transfer = Transfer()
+
   const AccountActions = {
     Close: 'close',
     Open: 'open'
@@ -138,6 +142,14 @@ export default function (app) {
       }
 
       const accountsSameOwner = (accountA.user === accountB.user)
+
+      if (!accountsSameOwner) {
+        const transferApproved = await transfer.isTransferApproved()
+
+        if (!transferApproved) {
+          return res.status(400).json({ message: `Failed to get approval for this transfer` })
+        }
+      }
 
       let newBalanceA = accountA.balance - amount
       const newBalanceB = accountB.balance + amount
