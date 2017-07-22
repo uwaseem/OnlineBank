@@ -137,15 +137,19 @@ export default function (app) {
         return res.status(400).json({ message: 'Cannot transfer to or from closed accounts' })
       }
 
-      if (accountA.user !== accountB.user) {
-        return res.status(400).json({ message: 'Cannot transfer to account of different user' })
-      }
+      const accountsSameOwner = (accountA.user === accountB.user)
 
-      const newBalanceA = accountA.balance - amount
+      let newBalanceA = accountA.balance - amount
       const newBalanceB = accountB.balance + amount
 
       if (newBalanceA < 0) {
         return res.status(400).json({ message: `Cannot transfer more than existing balance of ${accountA.balance}` })
+      }
+
+      newBalanceA = (!accountsSameOwner) ? newBalanceA - 100 : newBalanceA
+
+      if (newBalanceA < 0) {
+        return res.status(400).json({ message: `Not enough balance to cover transfer fee` })
       }
 
       const accounts = await Promise.all([
