@@ -1,7 +1,7 @@
 import Mongoose from 'mongoose'
 
-import './accounts'
-import './users'
+import './models/accounts'
+import './models/users'
 
 export default function () {
   const databaseUri = `mongodb://localhost/bank`
