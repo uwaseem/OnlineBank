@@ -43,5 +43,8 @@ This is a collection of endpoints to mimic the functionality of a small bank.
 
 ##TODO
 ```
-1. Pull out the Mongoose implementation from the routes into it's own module
+[x] Abstract out Mongoose from /users routes
+[ ] Abstract out Mongoose from /accounts routes
+[ ] Abstract out Mongoose from /balances routes
+[ ] Write unit test by stubbing/mocking Mongoose
 ```
