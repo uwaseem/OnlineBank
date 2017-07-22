@@ -1,3 +1,4 @@
+import Moment from 'moment'
 import Mongoose from 'mongoose'
 
 import Transfer from '../api/transfer'
@@ -144,6 +145,16 @@ export default function (app) {
       const accountsSameOwner = (accountA.user === accountB.user)
 
       if (!accountsSameOwner) {
+        const lastTransferToday = Moment(accountA.lastTransfer).isSame(Moment.utc().format(), 'day')
+
+        accountA.dailyTransferAmount = (lastTransferToday) ? amount + accountA.dailyTransferAmount : accountA.dailyTransferAmount
+
+        if (accountA.dailyTransferAmount > 10000) {
+          return res.status(400).json({ message: 'Daily transfer limit of 10000 exceeded' })
+        }
+
+        accountA.lastTransfer = Moment.utc().format()
+
         const transferApproved = await transfer.isTransferApproved()
 
         if (!transferApproved) {
@@ -164,8 +175,9 @@ export default function (app) {
         return res.status(400).json({ message: `Not enough balance to cover transfer fee` })
       }
 
+      const { dailyTransferAmount, lastTransfer } = accountA
       const accounts = await Promise.all([
-        Accounts.findOneAndUpdate({ name }, { balance: newBalanceA }, { new: true }),
+        Accounts.findOneAndUpdate({ name }, { balance: newBalanceA, dailyTransferAmount, lastTransfer }, { new: true }),
         Accounts.findOneAndUpdate({ name: receivingAccount }, { balance: newBalanceB }, { new: true })
       ])
 
