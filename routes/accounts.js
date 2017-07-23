@@ -1,9 +1,6 @@
-import Mongoose from 'mongoose'
-
 import AccountActions from '../actions/account'
 
 export default function (app) {
-  const Accounts = Mongoose.model('Accounts')
   const Account = AccountActions()
 
   app.get('/accounts', async (req, res) => {
@@ -48,14 +45,8 @@ export default function (app) {
     const accountInfo = req.body
 
     try {
-      let account = await Accounts.findOne({ name: accountInfo.name })
-
-      if (account) {
-        return res.status(400).json({ message: `Account ${accountInfo.name} already exist` })
-      }
-
-      account = await Accounts.create(accountInfo)
-      res.status(200).json(account)
+      const account = await Account.createAccount(accountInfo)
+      res.status(account.code).json({ message: account.message })
     } catch (error) {
       console.error('Error while creating account', error)
       res.status(500).json({ message: error.message })
@@ -65,19 +56,13 @@ export default function (app) {
   app.patch('/account/name/:name/:status', async (req, res) => {
     const { name, status } = req.params
 
-    // TODO: Use the enum instead later
     if (status !== 'open' && status !== 'close') {
       return res.status(404).json({ message: `${status} is an invalid account status` })
     }
 
     try {
-      const account = await Accounts.findOneAndUpdate({ name }, { status }, { new: true })
-
-      if (!account) {
-        return res.status(400).json({ message: `Failed to ${status} account ${name}` })
-      }
-
-      res.status(200).json(account)
+      const account = await Account.updateAccountByName(name, { status })
+      res.status(account.code).json({ message: account.message })
     } catch (error) {
       console.error(`Error while attempting to ${status} account`, error)
       res.status(500).json({ message: error.message })
@@ -88,13 +73,8 @@ export default function (app) {
     const { name } = req.params
 
     try {
-      const { result } = await Accounts.remove({ name })
-
-      if (!result.n) {
-        return res.status(400).json({ message: `Failed to delete account ${name}` })
-      }
-
-      res.sendStatus(200)
+      const result = await Account.deleteAccountByName(name)
+      res.status(200).json({ message: result.message })
     } catch (error) {
       console.error(`Error while deleting account ${name}`, error)
       res.status(500).json({ message: error.message })
