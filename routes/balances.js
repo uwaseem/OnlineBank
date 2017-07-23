@@ -1,10 +1,12 @@
 import Moment from 'moment'
 import Mongoose from 'mongoose'
 
+// import AccountActions from '../actions/account'
 import Transfer from '../api/transfer'
 
 export default function (app) {
   const Accounts = Mongoose.model('Accounts')
+  // const Account = AccountActions()
   const transfer = Transfer()
 
   const AccountActions = {
@@ -17,22 +19,17 @@ export default function (app) {
     Transfer: 'transfer'
   }
 
-  app.get('/balance/account/name/:name', async (req, res) => {
+ /*  app.get('/balance/account/name/:name', async (req, res) => {
     const { name } = req.params
 
     try {
-      const account = await Accounts.findOne({ name })
-
-      if (!account) {
-        return res.status(400).json({ message: `Account ${name} does not exist` })
-      }
-
-      res.status(200).json({ balance: account.balance })
+      const accounts = await Account.getAccountBalanceByName(name)
+      res.status(accounts.code).json({ message: accounts.message })
     } catch (error) {
       console.error(`Error while retrieving balance for account ${name}`, error)
       res.status(500).json({ message: error.message })
     }
-  })
+  }) */
 
   app.get('/balance/accounts/user/:user', async (req, res) => {
     const { user } = req.params

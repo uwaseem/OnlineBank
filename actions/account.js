@@ -75,9 +75,25 @@ export default function () {
     }
   }
 
+  async function getAccountBalanceByName (name) {
+    try {
+      const account = await getAllAccountsByQuery({ name })
+
+      if (!account || !account.success) {
+        return createReturnObject(400, false, account.message)
+      }
+
+      return createReturnObject(200, true, account.balance)
+    } catch (error) {
+      const message = `General failure when retrieving balnce for account ${name}`
+      return createReturnObject(500, true, message, error)
+    }
+  }
+
   return {
     getAllAccounts,
     getAllAccountsByQuery,
+    getAccountBalanceByName,
     createAccount,
     updateAccountByName,
     deleteAccountByName
