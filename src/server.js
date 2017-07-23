@@ -1,7 +1,7 @@
 import BodyParser from 'body-parser'
 import Express from 'express'
 
-import mongoDB from '../db/index'
+import mongoDB from '../db'
 import routesAccount from '../routes/accounts'
 import routesBalances from '../routes/balances'
 import routesUsers from '../routes/users'
