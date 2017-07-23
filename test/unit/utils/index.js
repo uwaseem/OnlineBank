@@ -4,7 +4,7 @@ import Assert from 'assert'
 
 import {
   createReturnObject
-} from '../../../utils/util'
+} from '../../../utils'
 
 describe('#createReturnObject', () => {
   describe('when success === \'true\' or \'false\'', () => {
@@ -21,7 +21,7 @@ describe('#createReturnObject', () => {
   })
 
   describe('when success !== \'true\' or \'false\'', () => {
-    it('should return code, success and message', () => {
+    it('should return 500 with the appropriate message', () => {
       const returnObject = createReturnObject(200, 'hello', 'This is a test')
       const expectedObject = {
         code: 500,

@@ -2,7 +2,7 @@ import Mongoose from 'mongoose'
 
 import {
   createReturnObject
-} from '../utils/util'
+} from '../utils'
 
 export default function () {
   const Users = Mongoose.model('Users')
