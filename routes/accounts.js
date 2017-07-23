@@ -1,12 +1,15 @@
 import Mongoose from 'mongoose'
 
+import AccountActions from '../actions/account'
+
 export default function (app) {
   const Accounts = Mongoose.model('Accounts')
+  const Account = AccountActions()
 
   app.get('/accounts', async (req, res) => {
     try {
-      const accounts = await Accounts.find()
-      res.status(200).json(accounts)
+      const accounts = await Account.getAllAccounts()
+      res.status(accounts.code).json({ message: accounts.message })
     } catch (error) {
       console.error('Error while retrieving all accounts', error)
       res.status(500).json({ message: error.message })

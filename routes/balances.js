@@ -144,7 +144,7 @@ export default function (app) {
 
       const lastTransferToday = Moment(accountA.lastTransfer).isSame(Moment.utc().format(), 'day')
 
-      accountA.dailyTransferAmount = (lastTransferToday) ? amount + accountA.dailyTransferAmount : accountA.dailyTransferAmount
+      accountA.dailyTransferAmount = (lastTransferToday) ? amount + accountA.dailyTransferAmount : amount
 
       if (accountA.dailyTransferAmount > 10000) {
         return res.status(400).json({ message: 'Daily transfer limit of 10000 exceeded' })
