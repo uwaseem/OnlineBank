@@ -21,7 +21,7 @@ export default function () {
 
       return createReturnObject(200, true, user)
     } catch (error) {
-      const message = `General failure when getting infromation for user ${username}`
+      const message = `General failure when getting information for user ${username}`
       return createReturnObject(500, true, message, error)
     }
   }
