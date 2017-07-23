@@ -77,13 +77,19 @@ export default function () {
 
   async function getAccountBalanceByName (name) {
     try {
-      const account = await getAllAccountsByQuery({ name })
+      const accounts = await getAllAccountsByQuery({ name })
 
-      if (!account || !account.success) {
-        return createReturnObject(400, false, account.message)
+      if (!accounts || !accounts.success) {
+        return createReturnObject(400, false, accounts.message)
       }
 
-      return createReturnObject(200, true, account.balance)
+      const balance = accounts.message
+        .map(account => {
+          const { name, user, balance, status } = account
+          return { name, user, balance, status }
+        })
+
+      return createReturnObject(200, true, balance)
     } catch (error) {
       const message = `General failure when retrieving balnce for account ${name}`
       return createReturnObject(500, true, message, error)
