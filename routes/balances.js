@@ -1,13 +1,15 @@
 import Moment from 'moment'
 import Mongoose from 'mongoose'
 
+import AccountActions from '../actions/account'
 import Transfer from '../api/transfer'
 
 export default function (app) {
   const Accounts = Mongoose.model('Accounts')
+  const Account = AccountActions()
   const transfer = Transfer()
 
-  const AccountActions = {
+  const AccountStatus = {
     Close: 'close',
     Open: 'open'
   }
@@ -21,13 +23,8 @@ export default function (app) {
     const { name } = req.params
 
     try {
-      const account = await Accounts.findOne({ name })
-
-      if (!account) {
-        return res.status(400).json({ message: `Account ${name} does not exist` })
-      }
-
-      res.status(200).json({ balance: account.balance })
+      const accounts = await Account.getAccountBalanceByName(name)
+      res.status(accounts.code).json({ message: accounts.message })
     } catch (error) {
       console.error(`Error while retrieving balance for account ${name}`, error)
       res.status(500).json({ message: error.message })
@@ -84,7 +81,7 @@ export default function (app) {
       const { balance, status } = account
       let newAmount
 
-      if (status === AccountActions.Close) {
+      if (status === AccountStatus.Close) {
         return res.status(403).json({ message: 'Account has been closed' })
       }
 
@@ -138,7 +135,7 @@ export default function (app) {
         return res.status(400).json({ message: `Account ${missingAccount} does not exist` })
       }
 
-      if (accountA.status === AccountActions.Close || accountB.status === AccountActions.Close) {
+      if (accountA.status === AccountStatus.Close || accountB.status === AccountStatus.Close) {
         return res.status(400).json({ message: 'Cannot transfer to or from closed accounts' })
       }
 
