@@ -25,8 +25,6 @@ describe('#Users', () => {
   after(() => {
     delete console.info
     delete console.error
-
-    Sinon.restore()
   })
 
   beforeEach(async () => {
