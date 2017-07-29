@@ -24,7 +24,6 @@ export default function (app) {
 
     try {
       const accounts = await Account.getAccountBalanceByName(name)
-      console.log('what is accounts', accounts)
       res.status(accounts.code).json({ message: accounts.message })
     } catch (error) {
       console.error(`Error while retrieving balance for account ${name}`, error)
