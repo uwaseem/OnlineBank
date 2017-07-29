@@ -12,6 +12,17 @@ describe('#Users', () => {
   const Users = Mongoose.model('Users')
   let app
 
+  before(() => {
+    const noop = () => {}
+    console.info = noop
+    console.error = noop
+  })
+
+  after(() => {
+    delete console.info
+    delete console.error
+  })
+
   beforeEach(async () => {
     const { server } = await Server()
     app = server
@@ -60,7 +71,7 @@ describe('#Users', () => {
         })
     })
 
-    it('should return 500 if failed to get users from MongoDB', (done) => {
+    it('should return 500 and error message if failed to get users from MongoDB', (done) => {
       Users.find.throws(Error('Failed to connect to MongoDB'))
 
       Request(app)

@@ -8,6 +8,17 @@ import Server from '../../src/server'
 describe('#Server', () => {
   let app
 
+  before(() => {
+    const noop = () => { }
+    console.info = noop
+    console.warn = noop
+  })
+
+  after(() => {
+    delete console.info
+    delete console.warn
+  })
+
   beforeEach(async () => {
     const { server } = await Server()
     app = server
