@@ -32,7 +32,7 @@ export default function () {
     try {
       const user = await getUserByUsername(username)
 
-      if (user) {
+      if (!user || user.success) {
         return createReturnObject(400, false, `Username ${username} already exist`)
       }
 

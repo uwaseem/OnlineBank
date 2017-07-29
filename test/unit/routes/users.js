@@ -16,6 +16,10 @@ describe('#Users', () => {
     const noop = () => {}
     console.info = noop
     console.error = noop
+
+    Sinon.stub(Users, 'find')
+    Sinon.stub(Users, 'findOne')
+    Sinon.stub(Users, 'create')
   })
 
   after(() => {
@@ -34,10 +38,6 @@ describe('#Users', () => {
   })
 
   describe('GET /users', () => {
-    before(() => {
-      Sinon.stub(Users, 'find')
-    })
-
     it('should return 200 and empty array if there are no users', (done) => {
       Users.find.returns([])
 
@@ -82,6 +82,108 @@ describe('#Users', () => {
             return done(error)
           }
           Assert.strictEqual(response.message, 'Failed to connect to MongoDB')
+          done()
+        })
+    })
+  })
+
+  describe('GET /user/username/:username', () => {
+    it('should return 200 and user\'s information if user exist', (done) => {
+      Users.findOne.returns(dummyUsersList[1])
+
+      Request(app)
+        .get('/user/username/spiderman')
+        .expect(200)
+        .end((error, { body: response }) => {
+          if (error) {
+            return done(error)
+          }
+
+          Assert.deepEqual(response.message, dummyUsersList[1])
+          done()
+        })
+    })
+
+    it('should return 400 and appropriate message if user does not exist', (done) => {
+      Users.findOne.returns(null)
+
+      Request(app)
+        .get('/user/username/batman')
+        .expect(400)
+        .end((error, { body: response }) => {
+          if (error) {
+            return done(error)
+          }
+
+          Assert.strictEqual(response.message, 'User batman does not exist')
+          done()
+        })
+    })
+
+    it('should return 500 and error message if failed to get user from MongoDB', (done) => {
+      Users.findOne.throws(Error('Failed to connect to MongoDB'))
+
+      Request(app)
+        .get('/user/username/deadpool')
+        .expect(500)
+        .end((error, { body: response }) => {
+          if (error) {
+            return done(error)
+          }
+          Assert.strictEqual(response.message, 'General failure when getting information for user deadpool')
+          done()
+        })
+    })
+  })
+
+  describe('POST /user', () => {
+    it('should return 200 and user\'s information if create user success', (done) => {
+      Users.findOne.returns(null)
+      Users.create.returns(dummyUsersList[0])
+
+      Request(app)
+        .post('/user')
+        .send({ username: 'spiderman', firstName: 'Peter', lastName: 'Parker' })
+        .expect(200)
+        .end((error, { body: response }) => {
+          if (error) {
+            return done(error)
+          }
+
+          Assert.deepEqual(response.message, dummyUsersList[0])
+          done()
+        })
+    })
+
+    it('should return 400 and appropriate message if user already exist', (done) => {
+      Users.findOne.returns(dummyUsersList[0])
+
+      Request(app)
+        .post('/user')
+        .send({ username: 'spiderman', firstName: 'Peter', lastName: 'Parker' })
+        .expect(400)
+        .end((error, { body: response }) => {
+          if (error) {
+            return done(error)
+          }
+
+          Assert.strictEqual(response.message, 'Username spiderman already exist')
+          done()
+        })
+    })
+
+    it('should return 500 and error message if failed to create user', (done) => {
+      Users.findOne.returns(null)
+      Users.create.throws(Error('Failed to connect to MongoDB'))
+
+      Request(app)
+        .post('/user')
+        .send({ username: 'spiderman', firstName: 'Peter', lastName: 'Parker' })
+        .end((error, { body: response }) => {
+          if (error) {
+            return done(error)
+          }
+          Assert.strictEqual(response.message, 'General failure when creating user spiderman')
           done()
         })
     })
