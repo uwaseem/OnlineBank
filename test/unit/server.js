@@ -48,7 +48,7 @@ describe('#Server', () => {
   describe('Other endpoints', () => {
     it('should return 404', (done) => {
       Request(app)
-        .get('/waseemAwesome')
+        .get('/testsAreAwesome')
         .expect(404, done)
     })
   })
