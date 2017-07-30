@@ -5,6 +5,7 @@ This is a collection of endpoints to mimic the functionality of a small bank.
 ```
 1. MongoDb -> `brew install mongodb`
 2. Create a database called `bank`
+3. Use node 7.8 or higher
 ```
 
 ## Setup
@@ -39,7 +40,6 @@ This is a collection of endpoints to mimic the functionality of a small bank.
 5. Transfer money to another account
 ```
 ## TODO
-1. ~~Abstract out Mongoose from /users routes~~
-2. ~~Abstract out Mongoose from /accounts routes~~
-3. Abstract out Mongoose from /balances routes
-4. Write unit test by stubbing/mocking Mongoose
+1. Abstract out Mongoose from /balances routes
+2. Write unit test for Accounts routes
+3. Write unit test for Balances routes
