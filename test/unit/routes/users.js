@@ -19,6 +19,7 @@ describe('#Users', () => {
 
     Sinon.stub(Users, 'find')
     Sinon.stub(Users, 'findOne')
+    Sinon.stub(Users, 'findOneAndUpdate')
     Sinon.stub(Users, 'create')
   })
 
@@ -184,6 +185,73 @@ describe('#Users', () => {
             return done(error)
           }
           Assert.strictEqual(response.message, 'General failure when creating user spiderman')
+          done()
+        })
+    })
+  })
+
+  describe('PUT /user/username/:username', () => {
+    it('should return 200 and user\'s information if update user success', (done) => {
+      Users.findOneAndUpdate.returns(dummyUsersList[0])
+
+      Request(app)
+        .put('/user/username/spiderman')
+        .send({ username: 'spiderman', firstName: 'Peter', lastName: 'Parker' })
+        .expect(200)
+        .end((error, { body: response }) => {
+          if (error) {
+            return done(error)
+          }
+
+          Assert.deepEqual(response.message, dummyUsersList[0])
+          done()
+        })
+    })
+
+    it('should return 400 and appropriate message if user does not exist', (done) => {
+      Users.findOneAndUpdate.returns(null)
+
+      Request(app)
+        .put('/user/username/batman')
+        .send({ username: 'batman', firstName: 'Bruce', lastName: 'Wayne' })
+        .expect(400)
+        .end((error, { body: response }) => {
+          if (error) {
+            return done(error)
+          }
+
+          Assert.strictEqual(response.message, 'Failed to update user batman')
+          done()
+        })
+    })
+
+    it('should return 400 and appropriate message if trying to update username', (done) => {
+      Request(app)
+        .put('/user/username/spiderman')
+        .send({ username: 'ironman', firstName: 'Peter', lastName: 'Parker' })
+        .expect(400)
+        .end((error, { body: response }) => {
+          if (error) {
+            return done(error)
+          }
+
+          Assert.strictEqual(response.message, 'Cannot update username')
+          done()
+        })
+    })
+
+    it('should return 500 and error message if failed to create user', (done) => {
+      Users.findOneAndUpdate.throws(Error('Failed to connect to MongoDB'))
+
+      Request(app)
+        .put('/user/username/spiderman')
+        .send({ username: 'spiderman', firstName: 'Peter', lastName: 'Parker' })
+        .end((error, { body: response }) => {
+          if (error) {
+            return done(error)
+          }
+
+          Assert.strictEqual(response.message, 'General failure when updating user spiderman')
           done()
         })
     })
