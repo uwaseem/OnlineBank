@@ -55,7 +55,7 @@ export default function (app) {
 
     try {
       const result = await User.deleteUserByUsername(username)
-      res.status(200).json({ message: result.message })
+      res.status(result.code).json({ message: result.message })
     } catch (error) {
       console.error(`Error while deleting user ${username}`, error)
       res.status(500).json({ message: error.message })
