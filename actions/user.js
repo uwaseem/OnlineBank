@@ -51,7 +51,7 @@ export default function () {
         return createReturnObject(400, false, `User ${username} does not exist`)
       }
 
-      return createReturnObject(200, true, `Succesfully deleted username ${username}`)
+      return createReturnObject(200, true, `Successfully deleted username ${username}`)
     } catch (error) {
       const message = `General failure when deleting user ${username}`
       return createReturnObject(500, true, message, error)

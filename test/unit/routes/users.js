@@ -21,6 +21,7 @@ describe('#Users', () => {
     Sinon.stub(Users, 'findOne')
     Sinon.stub(Users, 'findOneAndUpdate')
     Sinon.stub(Users, 'create')
+    Sinon.stub(Users, 'remove')
   })
 
   after(() => {
@@ -252,6 +253,55 @@ describe('#Users', () => {
           }
 
           Assert.strictEqual(response.message, 'General failure when updating user spiderman')
+          done()
+        })
+    })
+  })
+
+  describe('DELETE /user/username/:username', () => {
+    it('should return 200 and appropriate message if delete user success', (done) => {
+      Users.remove.returns({ result: { n: 1, ok: 1 } })
+
+      Request(app)
+        .delete('/user/username/spiderman')
+        .expect(200)
+        .end((error, { body: response }) => {
+          if (error) {
+            return done(error)
+          }
+
+          Assert.deepEqual(response.message, 'Successfully deleted username spiderman')
+          done()
+        })
+    })
+
+    it('should return 400 and appropriate message if user does not exist', (done) => {
+      Users.remove.returns({ result: { n: 0, ok: 1 } })
+
+      Request(app)
+        .delete('/user/username/batman')
+        .expect(400)
+        .end((error, { body: response }) => {
+          if (error) {
+            return done(error)
+          }
+
+          Assert.strictEqual(response.message, 'User batman does not exist')
+          done()
+        })
+    })
+
+    it('should return 500 and error message if failed to delete user', (done) => {
+      Users.remove.throws(Error('Failed to connect to MongoDB'))
+
+      Request(app)
+        .delete('/user/username/spiderman')
+        .end((error, { body: response }) => {
+          if (error) {
+            return done(error)
+          }
+
+          Assert.strictEqual(response.message, 'General failure when deleting user spiderman')
           done()
         })
     })
